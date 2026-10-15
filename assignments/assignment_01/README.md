@@ -1,150 +1,141 @@
-
 # FastAPI Assignment 01
 
-## Overview
+**Version:** 1.0.0
 
-This assignment covers the fundamental concepts of FastAPI,
-including HTTP methods, path parameters, query parameters,
-parameter validation, and Pydantic models.
+A FastAPI assignment for practicing path parameters, query parameters, request validation, Pydantic models, and CRUD operations.
 
-## Topics Covered
-
-1. Path Parameters
-2. GET Request
-3. POST Request
-4. PUT Request
-5. PATCH Request
-6. DELETE Request
-7. Query Parameters
-8. Parameter Validation
-9. Pydantic Models
-10. Automatic API Documentation
-
-## Project Structure
-
-```text
-fastapi-tutorial/
-├── main.py
-└── assignments/
-    └── assignment_01/
-        ├── main.py
-        └── README.md
-```
-
-## Requirements
+## Technologies Used
 
 - Python
 - FastAPI
 - Uvicorn
 - Pydantic
 
-## Installation
+## Run the Assignment
 
-Activate the existing virtual environment from the
-fastapi-tutorial project root:
-
-```bash
-source .venv/bin/activate
-```
-
-Install the required packages if necessary:
+From the root `fastapi-tutorial` directory, run:
 
 ```bash
-pip install fastapi uvicorn
+uv run uvicorn --app-dir assignments/assignment_01 main:app --reload --port 8001
 ```
 
-## Run the Application
+Open the API documentation:
 
-Run this command from the fastapi-tutorial root directory:
-
-```bash
-uvicorn assignments.assignment_01.main:app --reload
-```
-
-## API Documentation
-
-Open the following URL in your browser:
-
-http://127.0.0.1:8000/docs
-
-Alternative documentation:
-
-http://127.0.0.1:8000/redoc
+- Swagger UI: http://127.0.0.1:8001/docs
+- OpenAPI schema: http://127.0.0.1:8001/openapi.json
 
 ## API Endpoints
 
-| Method | Endpoint | Purpose |
+| Method | Endpoint | Description |
 |---|---|---|
-| GET | / | Welcome message |
-| GET | /students | List all students |
-| GET | /students/{student_id} | Get a student |
-| POST | /students/{student_id} | Create a student |
-| PUT | /students/{student_id} | Replace student data |
-| PATCH | /students/{student_id} | Update selected fields |
-| DELETE | /students/{student_id} | Delete a student |
-| GET | /search?course=BCA&limit=5 | Search students |
+| GET | `/` | Display the welcome message |
+| GET | `/students/{student_id}` | Retrieve a student by ID |
+| POST | `/students/{student_id}` | Create a new student |
+| PUT | `/students/{student_id}` | Replace a student's data |
+| PATCH | `/students/{student_id}` | Update selected student fields |
+| DELETE | `/students/{student_id}` | Delete a student |
+| GET | `/search?course=BCA&limit=10` | Search students by course |
+| GET | `/students` | List all students |
 
-## Example POST Request
+## Student Pydantic Model
 
-Endpoint:
+The `Student` model defines the required fields:
 
+| Field | Type | Validation |
+|---|---|---|
+| `name` | String | 2–50 characters |
+| `age` | Integer | 16–100 |
+| `course` | String | At least 2 characters |
+
+Example request body:
+
+```json
+{
+  "name": "Sejal",
+  "age": 21,
+  "course": "BCA"
+}
+```
+
+## Create a Student
+
+Send a POST request to:
+
+```http
 POST /students/2
+```
 
 Request body:
 
 ```json
 {
   "name": "Sejal",
-  "age": 20,
+  "age": 21,
   "course": "BCA"
 }
 ```
 
-## Example PATCH Request
+The endpoint creates a student with ID `2`, provided that the ID does not already exist.
 
-Endpoint:
+## Update a Student
 
+### PUT
+
+Send all required fields to replace a student's data:
+
+```http
+PUT /students/1
+```
+
+### PATCH
+
+Send only the fields you want to update:
+
+```http
 PATCH /students/1
+```
 
-Request body:
+Example body:
 
 ```json
 {
-  "name": "Sejal Oli"
+  "age": 22
 }
 ```
 
-## Example Query Parameters
+## Search Students
 
-```text
-/search?course=BCA&limit=5
+Search for students enrolled in BCA:
+
+```http
+GET /search?course=BCA&limit=10
 ```
 
-- course: Filters students by course.
-- limit: Controls the maximum number of returned results.
+- `course` is a required query parameter with a minimum length of 2.
+- `limit` is optional, defaults to 10, and must be between 1 and 100.
 
-## Parameter Validation
+## Delete a Student
 
-- Student ID must be a positive integer.
-- Student name must contain 2 to 50 characters.
-- Student age must be between 16 and 100.
-- Course name must contain at least 2 characters.
-- Search limit must be between 1 and 100.
+```http
+DELETE /students/1
+```
 
-Invalid request data is automatically rejected by FastAPI.
+The endpoint removes the student if the ID exists.
 
-## Pydantic Models
+## Concepts Practiced
 
-Pydantic BaseModel defines the expected structure of request data.
+- Path parameters using `Path`
+- Query parameters using `Query`
+- Request validation using Pydantic `Field`
+- Pydantic models for request bodies
+- HTTP methods: GET, POST, PUT, PATCH, DELETE
+- CRUD operations
+- HTTP error responses, including 404 and 409
 
-Field() adds validation rules to model fields.
+## Important Notes
 
-model_dump() converts a Pydantic model into a Python dictionary.
-
-## Important Note
-
-This assignment uses temporary in-memory storage.
-Data created during runtime is lost when the server restarts.
-
-The project is intended for learning and practice.
-It does not use a permanent database.
+- Student records are stored in a Python dictionary in memory, not in a database.
+- The assignment starts with one sample student: ID `1`, name `Ram`, age `20`, course `BCA`.
+- Changes are lost when the application restarts.
+- PUT replaces the data for the specified ID and can create a record if that ID does not exist.
+- PATCH updates the fields supplied in the request.
